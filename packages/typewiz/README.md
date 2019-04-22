@@ -51,7 +51,7 @@ or
 Use the `coverage` command and point it at your project's `tsconfig.json` to calculate and display the type coverage:
 
 ```bash
-typewiz coverage /path/to/projec/tsconfig.json
+typewiz coverage /path/to/project/tsconfig.json
 ```
 
 The output looks similar to this:
@@ -62,6 +62,23 @@ Your type coverage is: 92.01%
 ```
 
 The percentage represent the amount of identifier in the code whose type is known - i.e. that have a specific type (or such type could be inferred by TypeScript) which is not `any`. The higher the better. You can improve this number by adding more types to your code, for instance by using TypeWiz. This metric allows you to measure your progress in adding new types to your TypeScript project.
+
+If you wish to have a JSON report of the coverage details, provide a `--output` or `-o` optional argument to the coverage command line:
+
+```bash
+typewiz coverage /path/to/project/tsconfig.json -o type-coverage.json
+```
+
+The resulting `type-coverage.json` file will break down the type coverage information along three axes: variable declarations, parameters, and return types. Each will have its own coverage statistics, located in the `stats` field. For each of these axes, there is a further breakdown by file. Each file in turn has its own coverage `stats` field that quantifies type coverage on a per-file basis. Each file also provides an array of *incidents*, i.e. places where an `any` type is used (or inferred). An incident has the following schema:
+
+```
+interface Incident {
+    end: number; // end character position in the source file
+    name: string; // the short name of e.g. the declared variable or the parameter
+    start: number; // the end character position in the source file
+    text: string; // a somewhat longer surrounding textual context of the incident
+}
+```
 
 ### Instrument Your Code 
 

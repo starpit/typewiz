@@ -39,8 +39,8 @@ function applyTypesHandler(typesJson: string, opts: ICliOptions) {
     applyTypes(types, config);
 }
 
-function coverageHandler(tsConfigPath: string) {
-    const coverage = typeCoverage(getProgram({ tsConfig: tsConfigPath, rootDir: dirname(tsConfigPath) })!);
+function coverageHandler(tsConfigPath: string, opts: ICliOptions) {
+    const coverage = typeCoverage(getProgram({ tsConfig: tsConfigPath, rootDir: dirname(tsConfigPath) })!, opts.output);
     console.log(`${coverage.knownTypes} of ${coverage.totalTypes} types are known.`);
     console.log(`Your type coverage is: ${coverage.percentage.toFixed(2)}%`);
 }
@@ -70,6 +70,7 @@ program
 
 program
     .command('coverage <tsconfig.json>')
+    .option('-o, --output [output]', 'Emit a JSON coverage report')
     .description('Calculate type coverage for your project')
     .action(coverageHandler);
 
