@@ -92,6 +92,26 @@ export function typeCoverage(program: ts.Program, coverageFile?: string) {
             let type: ts.Type = checker.getTypeAtLocation(node);
             if (type) {
                 let isAny = checker.typeToString(type) === 'any';
+
+                if (isAny) {
+                    // handle catch clause decls
+                    const symbol = checker.getSymbolAtLocation(node);
+                    if (symbol) {
+                        const decls = symbol.getDeclarations();
+                        if (decls !== undefined) {
+                            const decl = decls[0];
+                            if (decl && decl.parent && ts.isCatchClause(decl.parent)) {
+                                // use of catch variable
+                                return;
+                            }
+                            if (decl && (ts.isImportSpecifier(decl) || ts.isNamespaceImport(decl))) {
+                                // use of namespace imports
+                                return;
+                            }
+                        }
+                    }
+                }
+
                 if (isAny && node.parent && ts.isImportSpecifier(node.parent)) {
                     const symbol = checker.getSymbolAtLocation(node.parent.name);
                     if (symbol) {
